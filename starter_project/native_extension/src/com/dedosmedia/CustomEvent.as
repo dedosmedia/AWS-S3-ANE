@@ -1,4 +1,4 @@
-package com.mycompany {
+package com.dedosmedia {
 import flash.events.Event;
 
 public class CustomEvent extends Event {

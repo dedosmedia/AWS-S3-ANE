@@ -22,9 +22,10 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{7082DC6C-1222-4351-9159-C1022D1D646E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>HelloWorldANE</RootNamespace>
+    <RootNamespace>AWSS3ANE</RootNamespace>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <ProjectName>AWSS3ANE</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -128,13 +129,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;$(TargetName)_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\dev\sdks\AIR\AIRSDK_28\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\DedosMedia\AIRSDK\WINDOWS\AIRSDK_29.0.0.108\all\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>D:\dev\sdks\AIR\AIRSDK_27\lib\win;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\DedosMedia\AIRSDK\WINDOWS\AIRSDK_29.0.0.108\all\lib\win;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>FlashRuntimeExtensions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -162,12 +163,12 @@
     <ClInclude Include="FreNamespace.h" />
     <ClInclude Include="FreSharpBridge.h" />
     <ClInclude Include="FreSharpMacros.h" />
-    <ClInclude Include="HelloWorldANE.h" />
+    <ClInclude Include="AWSS3ANE.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FreSharpBridge.cpp" />
-    <ClCompile Include="HelloWorldANE.cpp" />
+    <ClCompile Include="AWSS3ANE.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FreSharp">
@@ -178,7 +179,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HelloWorldANELib\HelloWorldANELib.csproj">
+    <ProjectReference Include="..\AWSS3ANELib\AWSS3ANELib.csproj">
       <Project>{71ced144-ed05-4414-9744-e359ac074b0e}</Project>
     </ProjectReference>
   </ItemGroup>

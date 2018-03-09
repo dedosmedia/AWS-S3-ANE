@@ -1,12 +1,12 @@
 REM Get the path to the script and trim to get the directory.
 @echo off
 SET SZIP="C:\Program Files\7-Zip\7z.exe"
-SET AIR_PATH="D:\dev\sdks\AIR\AIRSDK_28\bin\"
+SET AIR_PATH="E:\DedosMedia\AIRSDK\WINDOWS\AIRSDK_29.0.0.108\all\bin\"
 echo Setting path to current directory to:
 SET pathtome=%~dp0
 echo %pathtome%
 
-SET projectName=HelloWorldANE
+SET projectName=AWSS3ANE
 
 REM Setup the directory.
 echo Making directories.

@@ -1,5 +1,5 @@
 #include "FreSharpMacros.h"
-#include "HelloWorldANE.h"
+#include "AWSS3ANE.h"
 #include "FreSharpBridge.h"
 
 // XXXX is a placeholder for a unique identifier. Replace with, for example, your company initials and ANE ID eg MCHW

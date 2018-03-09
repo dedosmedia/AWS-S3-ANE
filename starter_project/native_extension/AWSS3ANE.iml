@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="Flex" version="4">
-  <component name="FlexBuildConfigurationManager" active="HelloWorldANE">
+  <component name="FlexBuildConfigurationManager" active="AWSS3ANE">
     <configurations>
-      <configuration name="HelloWorldANE" target-platform="Desktop" pure-as="true" output-type="Library" output-file="HelloWorldANE.swc" output-folder="$MODULE_DIR$/bin">
+      <configuration name="AWSS3ANE" target-platform="Desktop" pure-as="true" output-type="Library" output-file="AWSS3ANE.swc" output-folder="$MODULE_DIR$/bin">
         <dependencies target-player="27.0">
-          <sdk name="AIRSDK_27" />
+          <sdk name="AIRSDK_29.0.0.108_Beta" />
         </dependencies>
         <compiler-options>
+          <map>
+            <entry key="compiler.debug.swc" value="true" />
+          </map>
           <option name="additionalOptions" value="-swf-version=30" />
         </compiler-options>
         <packaging-air-desktop />
@@ -21,7 +24,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="AIRSDK_27" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="jdk" jdkName="AIRSDK_29.0.0.108_Beta" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

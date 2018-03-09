@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloWorldANE", "HelloWorldANE\HelloWorldANE.vcxproj", "{7082DC6C-1222-4351-9159-C1022D1D646E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AWSS3ANE", "AWSS3ANE\AWSS3ANE.vcxproj", "{7082DC6C-1222-4351-9159-C1022D1D646E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorldANELib", "HelloWorldANELib\HelloWorldANELib.csproj", "{71CED144-ED05-4414-9744-E359AC074B0E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSS3ANELib", "AWSS3ANELib\AWSS3ANELib.csproj", "{71CED144-ED05-4414-9744-E359AC074B0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,5 +38,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {81BF7EA7-9590-48DF-B6E8-3157AE55F561}
 	EndGlobalSection
 EndGlobal

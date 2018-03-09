@@ -8,8 +8,8 @@
     <ProjectGuid>{71CED144-ED05-4414-9744-E359AC074B0E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HelloWorldLib</RootNamespace>
-    <AssemblyName>HelloWorldANELib</AssemblyName>
+    <RootNamespace>AWSS3Lib</RootNamespace>
+    <AssemblyName>AWSS3ANELib</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
