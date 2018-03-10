@@ -97,15 +97,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;$(TargetName)_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\dev\sdks\AIR\AIRSDK_28\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\DedosMedia\AIRSDK\WINDOWS\AIRSDK_29.0.0.108\all\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>D:\dev\sdks\AIR\AIRSDK_27\lib\win;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\DedosMedia\AIRSDK\WINDOWS\AIRSDK_29.0.0.108\all\lib\win;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>FlashRuntimeExtensions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>$(ProjectDir)..\..\..\..\native_extension\ane\build-windows.bat</Command>
+      <Command>$(ProjectDir)..\..\..\..\native_extension\ane\debug-windows.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -160,7 +160,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\..\..\sdks\AIR\AIRSDK_28\include\FlashRuntimeExtensions.h" />
-    <ClInclude Include="FreNamespace.h" />
+    <ClInclude Include="FreNamespace.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="FreSharpBridge.h" />
     <ClInclude Include="FreSharpMacros.h" />
     <ClInclude Include="AWSS3ANE.h" />

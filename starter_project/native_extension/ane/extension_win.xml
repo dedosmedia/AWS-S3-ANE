@@ -8,8 +8,8 @@
         <platform name="Windows-x86">
             <applicationDeployment>
                 <nativeLibrary>AWSS3ANE.dll</nativeLibrary>
-                <initializer>XXXXExtInizer</initializer>
-                <finalizer>XXXXExtFinizer</finalizer>
+                <initializer>DEDOExtInizer</initializer>
+                <finalizer>DEDOExtFinizer</finalizer>
             </applicationDeployment>
         </platform>
 	</platforms>

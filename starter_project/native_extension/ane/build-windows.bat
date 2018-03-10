@@ -50,6 +50,14 @@ copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\FreSharp.pdb %
 copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\FreSharpCore.dll %pathtome%..\..\c_sharp_libs_x86\FreSharpCore.dll
 copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\FreSharp.dll %pathtome%..\..\c_sharp_libs_x86\FreSharp.dll
 
+
+echo Saving a copy of required dlls 
+xcopy %pathtome%..\..\native_library\win\%projectName%\x86\Release\*.dll %pathtome%..\..\c_sharp_libs_x86 /Y
+
+echo Copying required dlls and pdb for DEBUG
+xcopy %pathtome%..\..\native_library\win\%projectName%\x86\Release\*.dll %AIR_PATH%/Y
+xcopy %pathtome%..\..\native_library\win\%projectName%\x86\Release\*.pdb %AIR_PATH%/Y
+
 REM Run the build command.
 echo Building Release.
 call %AIR_PATH%adt.bat -package -target ane %pathtome%%projectName%.ane %pathtome%extension_win.xml -swc %pathtome%%projectName%.swc ^

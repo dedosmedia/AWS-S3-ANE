@@ -7,7 +7,7 @@
 // This must also be set in starter_project\native_extension\ane\extension_win.xml !
 
 extern "C" {
-	CONTEXT_INIT(XXXX) {
+	CONTEXT_INIT(DEDO) {
 		FREBRIDGE_INIT
 
 		/**************************************************************************/
@@ -16,17 +16,17 @@ extern "C" {
 
 		static FRENamedFunction extensionFunctions[] = {
 			 MAP_FUNCTION(init)
-			,MAP_FUNCTION(sayHello)
+			,MAP_FUNCTION(startS3Uploading)
 		};
 
 		SET_FUNCTIONS
 	}
 
-	CONTEXT_FIN(XXXX) {
+	CONTEXT_FIN(DEDO) {
 		FreSharpBridge::GetController()->OnFinalize();
 	}
-	EXTENSION_INIT(XXXX)
-	EXTENSION_FIN(XXXX)
+	EXTENSION_INIT(DEDO)
+	EXTENSION_FIN(DEDO)
 
 }
 

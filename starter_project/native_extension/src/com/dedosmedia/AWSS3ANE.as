@@ -34,16 +34,17 @@ public class AWSS3ANE extends EventDispatcher {
         }
     }
 
-    public function sayHello(myString:String, uppercase:Boolean, numRepeats:int):String {
-        var theRet:* = ctx.call("sayHello", myString, uppercase, numRepeats);
+
+    public function startS3Uploading(jsonFilePath:String):Boolean {
+        var theRet:* = ctx.call("startS3Uploading", jsonFilePath);
         if (theRet is ANEError) {
             throw theRet as ANEError;
         }
-        return theRet as String;
+        return theRet as Boolean;
     }
 
-    public function init():void {
-        var theRet:* = ctx.call("init");
+    public function init(accessKey:String, secretKey:String, region:String = null):void {
+        var theRet:* = ctx.call("init",accessKey, secretKey, region);
         if (theRet is ANEError) {
             throw theRet as ANEError;
         }
