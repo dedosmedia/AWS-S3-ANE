@@ -186,12 +186,14 @@ namespace AWSS3Lib {
                 trace("There is not Metadata");
             }
 
-            S3Object item   = new S3Object();
-            item.ImageFile  = imageFile;
-            item.JsonFile   = jsonFile;
-            item.Bucket = bucket;
-            item.Key        = key;
-            item.Metadata   = metadata;
+            S3Object item = new S3Object
+            {
+                ImageFile = imageFile,
+                JsonFile = jsonFile,
+                Bucket = bucket,
+                Key = key,
+                Metadata = metadata
+            };
             _queue.Add(item);
             return true.ToFREObject();
         }
@@ -314,6 +316,12 @@ namespace AWSS3Lib {
                 {
                     trace(amazonS3Exception.Message);
                     returnCode = S3Event.CREDENTIALS_INVALID;
+                }
+                if (amazonS3Exception.ErrorCode != null &&
+                    amazonS3Exception.ErrorCode.Equals("AccessDenied"))
+                {
+                    trace(amazonS3Exception.Message);
+                    returnCode = S3Event.BUCKET_ERROR;
                 }
                 else
                 {
