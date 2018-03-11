@@ -16,7 +16,6 @@ namespace AWSS3Lib
             {
                 try
                 {
-                    //DirectoryInfo dstDirectory = srcFile.Directory.Parent.CreateSubdirectory(subdirectory);
                     DirectoryInfo dstDirectory = srcFile.Directory.CreateSubdirectory(subdirectory);
                     string dstPath = dstDirectory.FullName + "\\" + srcFile.Name;
                     srcFile.CopyTo(dstPath, true);
@@ -24,7 +23,8 @@ namespace AWSS3Lib
                 }
                 catch (Exception ex)
                 {                    
-                    Context.SendEvent("TRACE", "<<<ERROR>>> MOVING/DELETING FILE " + ex);
+                    Context.SendEvent(S3Event.FILE_IO_ERROR, ex.Message);
+
                 }
             }
         }

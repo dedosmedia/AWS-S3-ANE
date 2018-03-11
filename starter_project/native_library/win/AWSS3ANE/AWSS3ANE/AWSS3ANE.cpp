@@ -16,7 +16,8 @@ extern "C" {
 
 		static FRENamedFunction extensionFunctions[] = {
 			 MAP_FUNCTION(init)
-			,MAP_FUNCTION(startS3Uploading)
+			,MAP_FUNCTION(enqueue)
+			,MAP_FUNCTION(upload)
 		};
 
 		SET_FUNCTIONS

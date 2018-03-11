@@ -28,26 +28,35 @@ public class AWSS3ANE extends EventDispatcher {
             case TRACE:
                 trace("[" + NAME + "]", event.code);
                 break;
-            case "MY_EVENT":
-                    dispatchEvent(new CustomEvent("MY_EVENT", event.code));
-                break;
+            default:
+                    dispatchEvent(new S3Event(S3Event.S3_EVENT, {code:event.code, level:event.level}));
+        }
+    }
+
+    /*
+    * Throw ANEError 10, cuando se intenta encolarun JSON no existente
+     */
+    public function enqueue(jsonFilePath:String, bucket:String = null):void {
+        var theRet:* = ctx.call("enqueue", jsonFilePath, bucket);
+        if (theRet is ANEError) {
+            throw theRet as ANEError;
+        }
+    }
+
+    public function upload():void {
+        var theRet:* = ctx.call("upload");
+        if (theRet is ANEError) {
+            throw theRet as ANEError;
         }
     }
 
 
-    public function startS3Uploading(jsonFilePath:String):Boolean {
-        var theRet:* = ctx.call("startS3Uploading", jsonFilePath);
+    public function init(accessKey:String, secretKey:String, region:String = null, debug:Boolean = false):Boolean {
+        var theRet:* = ctx.call("init",accessKey, secretKey, region, debug);
         if (theRet is ANEError) {
             throw theRet as ANEError;
         }
         return theRet as Boolean;
-    }
-
-    public function init(accessKey:String, secretKey:String, region:String = null):void {
-        var theRet:* = ctx.call("init",accessKey, secretKey, region);
-        if (theRet is ANEError) {
-            throw theRet as ANEError;
-        }
     }
 
 

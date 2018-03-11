@@ -14,20 +14,22 @@ using Amazon.S3;
 using Amazon.Runtime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
+using System.Text;
 
 
 namespace AWSS3Lib {
    public class MainController : FreSharpMainController {
         private Hwnd _airWindow;
-
+        private bool _debug = false;
 
         /*
          *    AWS S3 Variables 
          */
-        private bool _uploadInProgress = false;
-        private DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        private List<S3Object> _queue = new List<S3Object>();
         private AmazonS3Client client;
+        private bool _uploadInProgress = false;
+        private bool _clientInitialized = false;
+
 
 
         // Must have this function. It exposes the methods to our entry C++.
@@ -35,42 +37,122 @@ namespace AWSS3Lib {
             FunctionsDict =
                 new Dictionary<string, Func<FREObject, uint, FREObject[], FREObject>> {
                      {"init", InitController}
-                    ,{"startS3Uploading", StartS3Uploading}
-
-
+                    ,{"enqueue", Enqueue}
+                    ,{"upload", Upload}
 
                 };
             return FunctionsDict.Select(kvp => kvp.Key).ToArray();
         }
 
-      
 
+        public FREObject InitController(FREContext ctx, uint argc, FREObject[] argv)
+        {
+            Amazon.RegionEndpoint region;
+            FileHelper.Context = Context;
+
+            // get a reference to the AIR Window HWND
+            _airWindow = Process.GetCurrentProcess().MainWindowHandle;
+
+            if (argc > 3)
+            {
+                _debug = argv[3].AsBool();
+            }
+
+            if (argv[0] == FREObject.Zero || argv[1] == FREObject.Zero)
+            {
+                SendEvent(S3Event.CREDENTIALS_INVALID, "AWS Access Key and/or Secret key are missing.");
+                return FREObject.Zero;
+            } 
+
+            var accessKey = argv[0].AsString();
+            var secretKey = argv[1].AsString();
+
+            switch (argv[2].AsString())
+            {
+                case "us-east-2":
+                    region = Amazon.RegionEndpoint.USEast2;
+                    break;
+                case "us-west-1":
+                    region = Amazon.RegionEndpoint.USWest1;
+                    break;
+                case "us-west-2":
+                    region = Amazon.RegionEndpoint.USWest2;
+                    break;
+                case "ca-central-1":
+                    region = Amazon.RegionEndpoint.CACentral1;
+                    break;
+                case "ap-south-1":
+                    region = Amazon.RegionEndpoint.APSouth1;
+                    break;
+                case "ap-northeast-1":
+                    region = Amazon.RegionEndpoint.APNortheast1;
+                    break;
+                case "ap-northeast-2":
+                    region = Amazon.RegionEndpoint.APNortheast2;
+                    break;
+                case "ap-southeast-1":
+                    region = Amazon.RegionEndpoint.APSoutheast1;
+                    break;
+                case "ap-southeast-2":
+                    region = Amazon.RegionEndpoint.APSoutheast2;
+                    break;
+                case "cn-north-1":
+                    region = Amazon.RegionEndpoint.CNNorth1;
+                    break;
+                case "cn-northwest-1":
+                    region = Amazon.RegionEndpoint.CNNorthWest1;
+                    break;
+                case "eu-central-1":
+                    region = Amazon.RegionEndpoint.EUCentral1;
+                    break;
+                case "eu-west-1":
+                    region = Amazon.RegionEndpoint.EUWest1;
+                    break;
+                case "eu-west-2":
+                    region = Amazon.RegionEndpoint.EUWest2;
+                    break;
+                case "eu-west-3":
+                    region = Amazon.RegionEndpoint.EUWest3;
+                    break;
+                case "sa-east-1":
+                    region = Amazon.RegionEndpoint.SAEast1;
+                    break;
+                default:
+                    region = Amazon.RegionEndpoint.USEast1;
+                    break;
+            }
+
+            client = new AmazonS3Client(accessKey, secretKey, region);
+            _clientInitialized = true;
+
+            SendEvent(S3Event.CLIENT_INITIALIZED, "AWS Client Initialized in region: "+region.DisplayName);
+            return true.ToFREObject();
+        }
 
         /*
          *  
          * BEGIN AWS S3 FUNCTIONS
          *
          */
-        public FREObject StartS3Uploading(FREContext ctx, uint argc, FREObject[] argv)
+        public FREObject Enqueue(FREContext ctx, uint argc, FREObject[] argv)
         {
             if (argv[0] == FREObject.Zero) return FREObject.Zero;
-            if (_uploadInProgress == true) return false.ToFREObject();
 
             JObject parent;
             FileInfo imageFile;
             string key;
-            FileInfo jsonFile = new FileInfo(argv[0].AsString());
-            Dictionary<string,string> metadataDict;
+            string bucket;
             IEnumerable<JProperty> metadata = null;
+            FileInfo jsonFile = new FileInfo(argv[0].AsString());
 
             try
             {
                 parent = JObject.Parse(File.ReadAllText(jsonFile.FullName));
                 var filename = parent.Value<String>("file");
-                imageFile = new FileInfo(jsonFile.Directory.FullName + "\\" + filename);  // y si es null??
+                imageFile = new FileInfo(jsonFile.Directory.FullName + "\\" + filename);
                 if (filename == null || imageFile.Exists == false)
                 {
-                    FileHelper.moveFileToSubdirectory(jsonFile,"error");
+                    FileHelper.moveFileToSubdirectory(jsonFile, "error");
                     FreSharpHelper.ThrowFreException(FreResultSharp.FreInvalidArgument, "Property 'file' is missing in json or Image file does not exist. JSON moved to 'error' folder", FREObject.Zero);
                 }
 
@@ -79,10 +161,23 @@ namespace AWSS3Lib {
                 {
                     key = filename;
                 }
+
+                bucket = parent.Value<String>("bucket");
+                if (bucket == null)
+                {
+                    if (argc > 1)
+                    {
+                        bucket = argv[1].AsString();
+                    }
+                    else
+                    {
+                        //FreSharpHelper.ThrowFreException(FreResultSharp.FreInvalidArgument, "Bucket name is null", FREObject.Zero);
+                    }
+                }
             }
             catch (FileNotFoundException ex)
             {
-                // Intentaron enviar un json que no existe
+                // JSON file missing
                 return new FreException(ex).RawValue;
             }
             catch (JsonReaderException ex) {
@@ -100,111 +195,166 @@ namespace AWSS3Lib {
             }
             catch (NullReferenceException ex)
             {
-               Trace("Metadata key is missing");
+                trace("There is not Metadata");
             }
 
-            uploadObject(jsonFile, imageFile, key, metadata);
+            S3Object item   = new S3Object();
+            item.ImageFile  = imageFile;
+            item.JsonFile   = jsonFile;
+            item.Bucket = bucket;
+            item.Key        = key;
+            item.Metadata   = metadata;
+            _queue.Add(item);
             return true.ToFREObject();
         }
 
-        async void uploadObject(FileInfo jsonFile, FileInfo imageFile, string key, IEnumerable<JProperty> metadata)
+        public FREObject Upload(FREContext ctx, uint argc, FREObject[] argv)
         {
-            
-            _uploadInProgress = true;
-            int returnCode = await uploadObjectAsync(jsonFile, imageFile, key, metadata);
-            _uploadInProgress = false;
 
-            if (returnCode == 0)
+            if (_uploadInProgress == false)
             {
-                Trace("> UPLOAD PROCESS: [FINISHED (1)] - " + jsonFile.Name);
-                FileHelper.moveFileToSubdirectory(jsonFile, "done");
-                FileHelper.moveFileToSubdirectory(imageFile, "done");
+                try {
+                    if (_clientInitialized == false)   FreSharpHelper.ThrowFreException(FreResultSharp.FreActionscriptError, "[ERROR] AWS Client has not been initilized properly.", FREObject.Zero);
+                }
+                catch (Exception ex) {                    
+                    return new FreException(ex).RawValue;
+                }
+                
+                UploadObject();
             }
-            else if (returnCode < 0)
-            {
-                Trace("> UPLOAD PROCESS: [FAILED] - " + jsonFile.Name);
-
-                FileHelper.moveFileToSubdirectory(jsonFile, "error");
-                FileHelper.moveFileToSubdirectory(imageFile, "error");
-
-            }
-            else
-            {
-                Trace("> UPLOAD PROCESS: [NETWORK ERROR - RETRY LATER]");
-            }
-
-            // NOTIFICAR EVENTO, PARA INICIAR NUEVAMENTE EL PROCESO, SOLO CUANDO NO HAY ERROR DE RED
-            if (returnCode <= 0)
-            {
-                SendEvent("UPLOAD_COMPLETE", "");
-            }
+            return FREObject.Zero;
 
         }
 
-
-       
-
-        async Task<int> uploadObjectAsync(FileInfo jsonFile, FileInfo imageFile, string key, IEnumerable<JProperty> metadata)
+        async void UploadObject()
         {
-            int returnCode = 0;
+            if (_queue.Count == 0)
+                return;
+
+            _uploadInProgress = true;
+            S3Object item = _queue[0];
+            string returnCode = await UploadObjectAsync(item);
+
+
+            switch (returnCode)
+            {
+                case S3Event.OBJECT_UPLOADED:
+                    SendEvent(S3Event.OBJECT_UPLOADED, item.JsonFile.FullName);
+                    _queue.Remove(item);
+                    FileHelper.moveFileToSubdirectory(item.JsonFile, "done");
+                    FileHelper.moveFileToSubdirectory(item.ImageFile, "done");
+                    break;
+                case S3Event.UNKNOWN_ERROR:
+                    SendEvent(S3Event.UNKNOWN_ERROR, item.JsonFile.FullName);
+                    _queue.Remove(item);
+                    FileHelper.moveFileToSubdirectory(item.JsonFile, "error");
+                    FileHelper.moveFileToSubdirectory(item.ImageFile, "error");
+                    break;
+                case S3Event.CREDENTIALS_INVALID:
+                    SendEvent(S3Event.CREDENTIALS_INVALID, "Check the provided AWS Credentials.");
+                    _queue.Remove(item);
+                    break;
+                case S3Event.FILE_IO_ERROR:
+                    SendEvent(S3Event.FILE_IO_ERROR, item.ImageFile.FullName);
+                    _queue.Remove(item);
+                    break;
+                case S3Event.NETWORK_ERROR:
+                    SendEvent(S3Event.NETWORK_ERROR, "Network error");
+                    break;
+                case S3Event.REGION_ERROR:
+                    SendEvent(S3Event.REGION_ERROR, "S3 Bucket region is incorrect");
+                    _queue.Remove(item);
+                    break;
+                case S3Event.BUCKET_ERROR:
+                    SendEvent(S3Event.BUCKET_ERROR, "S3 Bucket name is incorrect");
+                    _queue.Remove(item);
+                    break;
+            }
+
+            _uploadInProgress = false;
+            if(_queue.Count > 0)
+                UploadObject();
+
+        }
+
+        async Task<string> UploadObjectAsync(S3Object item)
+        {
+            string returnCode = S3Event.OBJECT_UPLOADED;
             try
             {
-                
-                var bucket = "keshot-dedosmedia";
-               
                 TransferUtility fileTransferUtility = new TransferUtility(client);
                 TransferUtilityUploadRequest fileTransferUtilityRequest = new TransferUtilityUploadRequest
                 {
-                    BucketName = bucket,
-                    FilePath = imageFile.FullName,
-                    Key = "temp/photo.jpg",  
+                    BucketName = item.Bucket,
+                    FilePath = item.ImageFile.FullName,
+                    Key = item.Key,
                     StorageClass = S3StorageClass.StandardInfrequentAccess,
                     CannedACL = S3CannedACL.PublicRead
                 };
 
-                var metadataDict = metadata
-                            .ToDictionary(
-                                k => k.Name,
-                                v => v.Value.ToString());
-
-                foreach (KeyValuePair<string, string> pair in metadataDict)
+                if (item.Metadata != null)
                 {
-                    Trace(string.Format("Key = {0}, Value = {1}", pair.Key, pair.Value));
-                    fileTransferUtilityRequest.Metadata.Add("x-amz-meta-" + pair.Key, pair.Value.ToString());
+                    var metadataDict = item.Metadata
+                                .ToDictionary(
+                                    k => k.Name,
+                                    v => v.Value.ToString());
+
+                    foreach (KeyValuePair<string, string> pair in metadataDict)
+                    {
+
+                        var bytes = Encoding.UTF8.GetBytes(pair.Value);
+                        var asBase64Str = Convert.ToBase64String(bytes);
+
+                        // decode on NODEJS
+                        // var utf8encoded = (new Buffer("VjAwMDEwNDE4MTE1MTI3", 'base64')).toString('utf8');
+
+                        trace(string.Format("Key = {0}, Value = {1}, B64 {2}", pair.Key, pair.Value, asBase64Str));
+                        fileTransferUtilityRequest.Metadata.Add("x-amz-meta-" + pair.Key, asBase64Str);
+                    }
                 }
                 await fileTransferUtility.UploadAsync(fileTransferUtilityRequest);
             }
 
             catch (AmazonS3Exception amazonS3Exception)
             {
-                returnCode = 1;  // Credencials invalidas
                 if (amazonS3Exception.ErrorCode != null &&
                     (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
                     ||
                     amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
                 {
-                    Trace("[ERROR] - Check the provided AWS Credentials.");
-
+                    trace(amazonS3Exception.Message);
+                    returnCode = S3Event.CREDENTIALS_INVALID;
                 }
                 else
                 {
-                    Trace("[ERROR] - " + amazonS3Exception);
+                    trace(amazonS3Exception.Message);
+                    returnCode = S3Event.REGION_ERROR;
                 }
             }
             catch (AmazonServiceException ex)
             {
-                Trace("[ERROR] - AMAZON SERVICE EXCEPTION " + ex);
-                returnCode = 2; // Error de red, no hay internet posiblemnte?
+                trace(ex.Message);
+                returnCode = S3Event.NETWORK_ERROR;
             }
-            catch (KeyNotFoundException ex)
+            catch (ArgumentException ex)
             {
-                returnCode = -1;  // json mal formado... mover a error
-                Trace("[ERROR] - METADATA KEY NOT FOUND " + ex);
+                trace(ex.Message);
+                returnCode = S3Event.FILE_IO_ERROR;
+            }
+            catch (NullReferenceException ex)
+            {
+                trace(ex.Message);
+                returnCode = S3Event.BUCKET_ERROR; 
+            }
+            catch (InvalidOperationException ex)
+            {
+                trace(ex.Message);
+                returnCode = S3Event.BUCKET_ERROR;
             }
             catch (Exception ex)
             {
-                returnCode = -2; // Error generic, no sabemos, mover a error
-                Trace("[ERROR] - UNKNOWN ERROR " + ex);
+                trace(ex.Message);
+                returnCode = S3Event.UNKNOWN_ERROR;
             }
 
             return returnCode;
@@ -218,32 +368,19 @@ namespace AWSS3Lib {
 
 
 
+        
 
-        public FREObject InitController(FREContext ctx, uint argc, FREObject[] argv) {
-
-            FileHelper.Context = Context;
-
-            // get a reference to the AIR Window HWND
-            _airWindow = Process.GetCurrentProcess().MainWindowHandle;
-
-            if (argv[0] == FREObject.Zero) return FREObject.Zero;
-            if (argv[1] == FREObject.Zero) return FREObject.Zero;
-
-            var accessKey = argv[0].AsString();
-            var secretKey = argv[1].AsString();
-
-
-            var region    = argv[2].AsString();
-
-            // TODO: EndPoint configurable
-            client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.USEast1);
-
-            Trace(" > AWS Client initialized.");
-            return FREObject.Zero;
-
-
-
+        public void trace(params object[] values)
+        {
+            if (_debug)
+            {
+                var traceStr = values.Aggregate("", (current, value) => current + value + " ");
+                Debug.WriteLine(traceStr);
+                Trace(values);
+            } 
         }
+
+
 
        public override void OnFinalize() {
            

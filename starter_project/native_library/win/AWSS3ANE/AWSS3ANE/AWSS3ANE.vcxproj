@@ -159,13 +159,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\..\sdks\AIR\AIRSDK_28\include\FlashRuntimeExtensions.h" />
+    <ClInclude Include="E:\DedosMedia\AIRSDK\WINDOWS\AIRSDK_29.0.0.108\all\include\FlashRuntimeExtensions.h" />
     <ClInclude Include="FreNamespace.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="FreSharpBridge.h" />
     <ClInclude Include="FreSharpMacros.h" />
     <ClInclude Include="AWSS3ANE.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -185,7 +186,9 @@
       <Project>{71ced144-ed05-4414-9744-e359ac074b0e}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AWSS3ANE.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
