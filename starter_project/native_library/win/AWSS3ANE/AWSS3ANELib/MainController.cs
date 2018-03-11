@@ -148,14 +148,9 @@ namespace AWSS3Lib {
             try
             {
                 parent = JObject.Parse(File.ReadAllText(jsonFile.FullName));
+
                 var filename = parent.Value<String>("file");
                 imageFile = new FileInfo(jsonFile.Directory.FullName + "\\" + filename);
-                if (filename == null || imageFile.Exists == false)
-                {
-                    FileHelper.moveFileToSubdirectory(jsonFile, "error");
-                    FreSharpHelper.ThrowFreException(FreResultSharp.FreInvalidArgument, "Property 'file' is missing in json or Image file does not exist. JSON moved to 'error' folder", FREObject.Zero);
-                }
-
                 key = parent.Value<String>("key");
                 if (key == null)
                 {
@@ -163,16 +158,9 @@ namespace AWSS3Lib {
                 }
 
                 bucket = parent.Value<String>("bucket");
-                if (bucket == null)
+                if (bucket == null && argc > 1)
                 {
-                    if (argc > 1)
-                    {
                         bucket = argv[1].AsString();
-                    }
-                    else
-                    {
-                        //FreSharpHelper.ThrowFreException(FreResultSharp.FreInvalidArgument, "Bucket name is null", FREObject.Zero);
-                    }
                 }
             }
             catch (FileNotFoundException ex)
@@ -256,6 +244,8 @@ namespace AWSS3Lib {
                     break;
                 case S3Event.FILE_IO_ERROR:
                     SendEvent(S3Event.FILE_IO_ERROR, item.ImageFile.FullName);
+                    FileHelper.moveFileToSubdirectory(item.JsonFile, "error");
+                    FileHelper.moveFileToSubdirectory(item.ImageFile, "error");
                     _queue.Remove(item);
                     break;
                 case S3Event.NETWORK_ERROR:

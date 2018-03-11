@@ -166,7 +166,6 @@
     <ClInclude Include="FreSharpBridge.h" />
     <ClInclude Include="FreSharpMacros.h" />
     <ClInclude Include="AWSS3ANE.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -185,9 +184,6 @@
     <ProjectReference Include="..\AWSS3ANELib\AWSS3ANELib.csproj">
       <Project>{71ced144-ed05-4414-9744-e359ac074b0e}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="AWSS3ANE.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
