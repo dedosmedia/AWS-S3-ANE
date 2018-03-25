@@ -1,7 +1,7 @@
 REM Get the path to the script and trim to get the directory.
 @echo off
 SET SZIP="C:\Program Files\7-Zip\7z.exe"
-SET AIR_PATH="E:\DedosMedia\AIRSDK\WINDOWS\AIRSDK_29.0.0.108\all\bin\"
+SET AIR_PATH="E:\DedosMedia\AIRSDK\WINDOWS\AIRSDK_29.0.0.112\bin\"
 echo Setting path to current directory to:
 SET pathtome=%~dp0
 echo %pathtome%

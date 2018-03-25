@@ -8,7 +8,7 @@
         </dependencies>
         <compiler-options>
           <map>
-            <entry key="compiler.debug.swc" value="false" />
+            <entry key="compiler.debug.swc" value="true" />
           </map>
           <option name="additionalOptions" value="-swf-version=30" />
         </compiler-options>
