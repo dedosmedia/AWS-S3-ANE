@@ -15,7 +15,8 @@ using Amazon.Runtime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text;
-
+using SharpRaven;
+using SharpRaven.Data;
 
 namespace AWSS3Lib {
    public class MainController : FreSharpMainController {
@@ -29,7 +30,7 @@ namespace AWSS3Lib {
         private AmazonS3Client client;
         private bool _uploadInProgress = false;
         private bool _clientInitialized = false;
-
+        private RavenClient ravenClient;
 
 
         // Must have this function. It exposes the methods to our entry C++.
@@ -49,6 +50,11 @@ namespace AWSS3Lib {
         {
             Amazon.RegionEndpoint region;
             FileHelper.Context = Context;
+
+
+            AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver.MyResolveEventHandler;
+
+            ravenClient = new RavenClient("https://0c0675871d7d417793e31cce53b620cc:b311da8b5bfd4788976364e50618f995@sentry.io/301641");
 
             // get a reference to the AIR Window HWND
             _airWindow = Process.GetCurrentProcess().MainWindowHandle;
@@ -125,7 +131,7 @@ namespace AWSS3Lib {
             client = new AmazonS3Client(accessKey, secretKey, region);
             _clientInitialized = true;
 
-            SendEvent(S3Event.CLIENT_INITIALIZED, "AWS Client Initialized in region: "+region.DisplayName);
+            SendEvent(S3Event.CLIENT_INITIALIZED, "AWS Client Initialized in region: "+region.DisplayName+" "+ ravenClient.ToString());
             return true.ToFREObject();
         }
 
@@ -166,6 +172,7 @@ namespace AWSS3Lib {
             catch (FileNotFoundException ex)
             {
                 // JSON file missing
+                ravenClient.Capture(new SentryEvent(ex));
                 return new FreException(ex).RawValue;
             }
             catch (JsonReaderException ex) {

@@ -41,12 +41,9 @@ echo Copying native libraries into place.
 
 copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\%projectName%.dll %pathtome%platforms\win\x86\release
 copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\%projectName%Lib.dll %AIR_PATH%%projectName%Lib.dll
-copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\%projectName%Lib.pdb %AIR_PATH%%projectName%Lib.pdb
 copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\%projectName%Lib.dll %pathtome%..\..\c_sharp_libs_x86\%projectName%Lib.dll
 copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\FreSharpCore.dll %AIR_PATH%FreSharpCore.dll
-copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\FreSharpCore.pdb %AIR_PATH%FreSharpCore.pdb
 copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\FreSharp.dll %AIR_PATH%FreSharp.dll
-copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\FreSharp.pdb %AIR_PATH%FreSharp.pdb
 copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\FreSharpCore.dll %pathtome%..\..\c_sharp_libs_x86\FreSharpCore.dll
 copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\FreSharp.dll %pathtome%..\..\c_sharp_libs_x86\FreSharp.dll
 
@@ -54,9 +51,9 @@ copy %pathtome%..\..\native_library\win\%projectName%\x86\Release\FreSharp.dll %
 echo Saving a copy of required dlls 
 xcopy %pathtome%..\..\native_library\win\%projectName%\x86\Release\*.dll %pathtome%..\..\c_sharp_libs_x86 /Y
 
-echo Copying required dlls and pdb for DEBUG
+echo Copying required dlls
 xcopy %pathtome%..\..\native_library\win\%projectName%\x86\Release\*.dll %AIR_PATH%/Y
-xcopy %pathtome%..\..\native_library\win\%projectName%\x86\Release\*.pdb %AIR_PATH%/Y
+
 
 REM Run the build command.
 echo Building Release.
