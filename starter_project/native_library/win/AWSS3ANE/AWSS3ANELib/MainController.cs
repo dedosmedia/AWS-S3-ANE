@@ -287,7 +287,7 @@ namespace AWSS3Lib {
                     BucketName = item.Bucket,
                     FilePath = item.ImageFile.FullName,
                     Key = item.Key,
-                    StorageClass = S3StorageClass.StandardInfrequentAccess,
+                    StorageClass = S3StorageClass.Standard,
                     CannedACL = S3CannedACL.PublicRead
                 };
 
