@@ -1,9 +1,9 @@
 REM Get the path to the script and trim to get the directory.
 @echo off
 SET SZIP="C:\Program Files\7-Zip\7z.exe"
-SET AIR_PATH="E:\DedosMedia\AIRSDK\WINDOWS\AIRSDK_29.0.0.112\bin\"
+SET AIR_PATH="C:\SDK\AIR_SDK\29\bin\"
 echo Setting path to current directory to:
-SET pathtome=%~dp0
+SET pathtome="%~dp0"
 echo %pathtome%
 
 SET projectName=AWSS3ANE
@@ -55,15 +55,20 @@ echo Copying required dlls
 xcopy %pathtome%..\..\native_library\win\%projectName%\x86\Release\*.dll %AIR_PATH%/Y
 
 
+
+
 REM Run the build command.
 echo Building Release.
-call %AIR_PATH%adt.bat -package -target ane %pathtome%%projectName%.ane %pathtome%extension_win.xml -swc %pathtome%%projectName%.swc ^
--platform Windows-x86 -C %pathtome%platforms\win\x86\release %projectName%.dll library.swf
 
-call DEL /F /Q /A %pathtome%platforms\win\x86\release\%projectName%.dll
-call DEL /F /Q /A %pathtome%platforms\win\x86\release\library.swf
-call DEL /F /Q /A %pathtome%%projectName%.swc
-call DEL /F /Q /A %pathtome%library.swf
-call DEL /F /Q /A %pathtome%catalog.xml
+SET pathtome=%~dp0
+
+call %AIR_PATH%adt.bat -package -target ane %projectName%.ane extension_win.xml -swc %projectName%.swc ^
+-platform Windows-x86 -C "%pathtome%\platforms\win\x86\release" %projectName%.dll library.swf
+
+call DEL /F /Q /A "%pathtome%platforms\win\x86\release\%projectName%.dll"
+call DEL /F /Q /A "%pathtome%platforms\win\x86\release\library.swf"
+call DEL /F /Q /A "%pathtome%%projectName%.swc"
+call DEL /F /Q /A "%pathtome%library.swf"
+call DEL /F /Q /A "%pathtome%catalog.xml"
 
 echo FIN
